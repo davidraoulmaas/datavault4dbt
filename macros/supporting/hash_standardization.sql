@@ -54,12 +54,6 @@ CONCAT('\"', REPLACE(REPLACE(REPLACE(TRIM(CAST([EXPRESSION] AS STRING)), '\\', '
 
 {%- endmacro -%}
 
-{%- macro redshift__attribute_standardise(hash_type) -%}
-
-'"' ||  REPLACE(REPLACE(REPLACE(TRIM(BOTH ' ' FROM [EXPRESSION]), '\\', '\\\\'), '[QUOTE]', '\\"'), '[NULL_PLACEHOLDER_STRING]', '--') || '"'
-
-{%- endmacro -%}
-
                                     
 {%- macro duckdb__attribute_standardise(hash_type) -%}
 
@@ -74,6 +68,7 @@ CONCAT('\"', REPLACE(REPLACE(REPLACE(TRIM(CAST([EXPRESSION] AS STRING)), '\\', '
 {% endif %}
 
 {%- endmacro -%}
+
 
 {%- macro redshift__attribute_standardise(hash_type) -%}
 
