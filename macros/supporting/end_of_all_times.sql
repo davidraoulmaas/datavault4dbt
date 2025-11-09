@@ -128,14 +128,14 @@
 {%- endmacro -%}
 
 
-{%- macro postgres__end_of_all_times() %}
+{%- macro duckdb__end_of_all_times() %}
 
 {%- set global_var = var('datavault4dbt.end_of_all_times', none) -%}
 {%- set end_of_all_times = '' -%}
 
 {%- if global_var is mapping -%}
-    {%- if 'postgres' in global_var.keys()|map('lower') -%}
-        {% set end_of_all_times = global_var['postgres'] %}
+    {%- if 'duckdb' in global_var.keys()|map('lower') -%}
+        {% set end_of_all_times = global_var['duckdb'] %}
     {%- else -%}
         {%- if execute -%}
             {%- do exceptions.warn("Warning: You have set the global variable 'datavault4dbt.end_of_all_times' to a dictionary, but have not included the adapter you use (postgres) as a key. Applying the default value.") -%}

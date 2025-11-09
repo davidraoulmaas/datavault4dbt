@@ -6,6 +6,10 @@
     {{ dbt.current_timestamp() }}
 {% endmacro %}
 
+{% macro duckdb__current_timestamp() %}
+    {{ return('current_timestamp()') }}
+{% endmacro %}
+
 {% macro synapse__current_timestamp() %}
     sysdatetime()
 {% endmacro %}

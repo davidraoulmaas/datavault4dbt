@@ -105,14 +105,14 @@
 {%- endmacro -%}  
 
 
-{%- macro postgres__timestamp_default_dtype() %}
+{%- macro duckdb__timestamp_default_dtype() %}
 
 {%- set global_var = var('datavault4dbt.timestamp_default_dtype', none) -%}
 {%- set timestamp_default_dtype = '' -%}
 
 {%- if global_var is mapping -%}
-    {%- if 'postgres' in global_var.keys()|map('lower') -%}
-        {% set timestamp_default_dtype = global_var['postgres'] %}
+    {%- if 'duckdb' in global_var.keys()|map('lower') -%}
+        {% set timestamp_default_dtype = global_var['duckdb'] %}
     {%- else -%}
         {%- if execute -%}
             {%- do exceptions.warn("Warning: You have set the global variable 'datavault4dbt.timestamp_default_dtype' to a dictionary, but have not included the adapter you use (postgres) as a key. Applying the default value.") -%}

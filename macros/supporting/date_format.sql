@@ -105,24 +105,24 @@
 {%- endmacro -%}
 
 
-{%- macro postgres__date_format() %}
+{%- macro duckdb__date_format() %}
 
 {%- set global_var = var('datavault4dbt.date_format', none) -%}
 {%- set date_format = '' -%}
 
 {%- if global_var is mapping -%}
-    {%- if 'postgres' in global_var.keys()|map('lower') -%}
-        {% set date_format = global_var['postgres'] %}
+    {%- if 'duckdb' in global_var.keys()|map('lower') -%}
+        {% set date_format = global_var['duckdb'] %}
     {%- else -%}
         {%- if execute -%}
             {%- do exceptions.warn("Warning: You have set the global variable 'datavault4dbt.date_format' to a dictionary, but have not included the adapter you use (postgres) as a key. Applying the default value.") -%}
         {% endif %}
-        {%- set date_format = "YYYY-MM-DD" -%}
+        {%- set date_format = "%Y-%M-%d" -%}
     {% endif %}
 {%- elif global_var is not mapping and datavault4dbt.is_something(global_var) -%}
     {%- set date_format = global_var -%}
 {%- else -%}
-    {%- set date_format = "YYYY-MM-DD" -%}
+    {%- set date_format = "%Y-%M-%d" -%}
 {%- endif -%}
 
 {{ return(date_format) }}

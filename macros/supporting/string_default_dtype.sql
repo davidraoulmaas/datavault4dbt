@@ -141,7 +141,7 @@
 {%- endmacro -%}  
 
 
-{%- macro postgres__string_default_dtype(type) %}
+{%- macro duckdb__string_default_dtype(type) %}
 
 {%- if type == 'rsrc' %}  
     {%- set global_var = var('datavault4dbt.rsrc_default_dtype', none) -%}
@@ -156,8 +156,8 @@
 {%- set string_default_dtype = '' -%}
 
 {%- if global_var is mapping -%}
-    {%- if 'postgres' in global_var.keys()|map('lower') -%}
-        {% set string_default_dtype = global_var['postgres'] %}
+    {%- if 'duckdb' in global_var.keys()|map('lower') -%}
+        {% set string_default_dtype = global_var['duckdb'] %}
     {%- else -%}
         {%- if execute -%}
             {%- do exceptions.warn("Warning: You have set the global variable 'datavault4dbt." ~ type ~ "_default_dtype' to a dictionary, but have not included the adapter you use (postgres) as a key. Applying the default value.") -%}

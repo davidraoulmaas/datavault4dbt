@@ -346,7 +346,7 @@
 {%- endmacro -%}
 
 
-{%- macro postgres__ghost_record_per_datatype(column_name, datatype, ghost_record_type, col_size, alias) -%}
+{%- macro duckdb__ghost_record_per_datatype(column_name, datatype, ghost_record_type, col_size, alias) -%}
 
 {%- set beginning_of_all_times = datavault4dbt.beginning_of_all_times() -%}
 {%- set end_of_all_times = datavault4dbt.end_of_all_times() -%}
@@ -367,7 +367,7 @@
        {%- if 'TIMESTAMP' in datatype %}{{ datavault4dbt.string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ alias }}
         {%- elif datatype == 'TIME WITH TIME ZONE' %} CAST('00:00:01 UTC' as TIMETZ) as {{ alias }}
         {%- elif datatype == 'TIME WITHOUT TIME ZONE' %} CAST('00:00:01' as TIME) as {{ alias }}
-        {%- elif datatype == 'DATE'-%} TO_DATE('{{ beginning_of_all_times_date }}', '{{ date_format }}' ) as {{ alias }}
+        {%- elif datatype == 'DATE'-%} strptime('{{ beginning_of_all_times_date }}', '{{ date_format }}' ) as {{ alias }}
         {%- elif 'CHAR' in datatype or datatype == 'TEXT' %} '{{unknown_value__STRING}}' as {{ alias }}        
         {%- elif datatype in ['INTEGER', 'INT', 'INT2', 'INT4', 'INT8', 'SMALLINT', 'BIGINT', 'REAL', 'FLOAT4', 'DOUBLE PRECISION', 'DOUBLE', 'FLOAT', 'FLOAT8'] %} CAST({{unknown_value__numeric}} as {{ datatype }}) as {{ alias }}
         {%- elif 'DECIMAL' in datatype or 'NUMERIC' in datatype %} CAST({{unknown_value__numeric}} as {{ datatype }}) as {{ alias }}
@@ -378,7 +378,7 @@
         {%- if 'TIMESTAMP' in datatype %}{{ datavault4dbt.string_to_timestamp(timestamp_format, end_of_all_times) }} as {{ alias }}
         {%- elif datatype == 'TIME WITH TIME ZONE' %} CAST('23:59:59 UTC' as TIMETZ) as {{ alias }}
         {%- elif datatype == 'TIME WITHOUT TIME ZONE' %} CAST('23:59:59' as TIME) as {{ alias }}
-        {%- elif datatype == 'DATE'-%} TO_DATE('{{ end_of_all_times_date }}', '{{ date_format }}' ) as {{ alias }}
+        {%- elif datatype == 'DATE'-%} strptime('{{ end_of_all_times_date }}', '{{ date_format }}' ) as {{ alias }}
         {%- elif 'CHAR' in datatype or datatype == 'TEXT' %} '{{error_value__STRING}}' as {{ alias }}
         {%- elif datatype in ['INTEGER', 'INT', 'INT2', 'INT4', 'INT8', 'SMALLINT', 'BIGINT', 'REAL', 'FLOAT4', 'DOUBLE PRECISION', 'DOUBLE', 'FLOAT', 'FLOAT8'] %} CAST({{error_value__numeric}} as {{ datatype }}) as {{ alias }}
         {%- elif 'DECIMAL' in datatype or 'NUMERIC' in datatype %} CAST({{error_value__numeric}} as {{ datatype }}) as {{ alias }}
