@@ -346,6 +346,53 @@
 {%- endmacro -%}
 
 
+{%- macro postgres__ghost_record_per_datatype(column_name, datatype, ghost_record_type, col_size, alias) -%}
+
+{%- set beginning_of_all_times = datavault4dbt.beginning_of_all_times() -%}
+{%- set end_of_all_times = datavault4dbt.end_of_all_times() -%}
+{%- set timestamp_format = datavault4dbt.timestamp_format() -%}
+
+{%- set beginning_of_all_times_date = datavault4dbt.beginning_of_all_times_date() -%}
+{%- set end_of_all_times_date = datavault4dbt.end_of_all_times_date() -%}
+{%- set date_format = datavault4dbt.date_format() -%}
+
+{%- set unknown_value__numeric = var('datavault4dbt.unknown_value__numeric', '-1') -%}
+{%- set error_value__numeric = var('datavault4dbt.error_value__numeric', '-2') -%}
+
+{%- set unknown_value__STRING = var('datavault4dbt.unknown_value__STRING', '(unknown)') -%}
+{%- set error_value__STRING = var('datavault4dbt.error_value__STRING', '(error)') -%}
+{%- set datatype = datatype | string | upper | trim -%}
+
+{%- if ghost_record_type == 'unknown' -%}
+       {%- if 'TIMESTAMP' in datatype %}{{ datavault4dbt.string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ alias }}
+        {%- elif datatype == 'TIME WITH TIME ZONE' %} CAST('00:00:01 UTC' as TIMETZ) as {{ alias }}
+        {%- elif datatype == 'TIME WITHOUT TIME ZONE' %} CAST('00:00:01' as TIME) as {{ alias }}
+        {%- elif datatype == 'DATE'-%} TO_DATE('{{ beginning_of_all_times_date }}', '{{ date_format }}' ) as {{ alias }}
+        {%- elif 'CHAR' in datatype or datatype == 'TEXT' %} '{{unknown_value__STRING}}' as {{ alias }}        
+        {%- elif datatype in ['INTEGER', 'INT', 'INT2', 'INT4', 'INT8', 'SMALLINT', 'BIGINT', 'REAL', 'FLOAT4', 'DOUBLE PRECISION', 'DOUBLE', 'FLOAT', 'FLOAT8'] %} CAST({{unknown_value__numeric}} as {{ datatype }}) as {{ alias }}
+        {%- elif 'DECIMAL' in datatype or 'NUMERIC' in datatype %} CAST({{unknown_value__numeric}} as {{ datatype }}) as {{ alias }}
+        {%- elif datatype == 'BOOLEAN' %} CAST('FALSE' as BOOLEAN) as {{ alias }}
+        {%- else %} CAST(NULL as {{ datatype }}) as {{ alias }}
+        {% endif %}
+{%- elif ghost_record_type == 'error' -%}
+        {%- if 'TIMESTAMP' in datatype %}{{ datavault4dbt.string_to_timestamp(timestamp_format, end_of_all_times) }} as {{ alias }}
+        {%- elif datatype == 'TIME WITH TIME ZONE' %} CAST('23:59:59 UTC' as TIMETZ) as {{ alias }}
+        {%- elif datatype == 'TIME WITHOUT TIME ZONE' %} CAST('23:59:59' as TIME) as {{ alias }}
+        {%- elif datatype == 'DATE'-%} TO_DATE('{{ end_of_all_times_date }}', '{{ date_format }}' ) as {{ alias }}
+        {%- elif 'CHAR' in datatype or datatype == 'TEXT' %} '{{error_value__STRING}}' as {{ alias }}
+        {%- elif datatype in ['INTEGER', 'INT', 'INT2', 'INT4', 'INT8', 'SMALLINT', 'BIGINT', 'REAL', 'FLOAT4', 'DOUBLE PRECISION', 'DOUBLE', 'FLOAT', 'FLOAT8'] %} CAST({{error_value__numeric}} as {{ datatype }}) as {{ alias }}
+        {%- elif 'DECIMAL' in datatype or 'NUMERIC' in datatype %} CAST({{error_value__numeric}} as {{ datatype }}) as {{ alias }}
+        {%- elif datatype == 'BOOLEAN' %} CAST('FALSE' as BOOLEAN) as {{ alias }}
+        {%- else %} CAST(NULL as {{ datatype }}) as {{ alias }}
+        {% endif %}
+{%- else -%}
+    {%- if execute -%}
+        {{ exceptions.raise_compiler_error("Invalid Ghost Record Type. Accepted are 'unknown' and 'error'.") }}
+    {%- endif %}
+{%- endif -%}
+{%- endmacro -%}
+
+
 {%- macro duckdb__ghost_record_per_datatype(column_name, datatype, ghost_record_type, col_size, alias) -%}
 
 {%- set beginning_of_all_times = datavault4dbt.beginning_of_all_times() -%}
